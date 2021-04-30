@@ -1,0 +1,56 @@
+version: "3"
+
+services:
+    react-client:
+        image: react-client
+        build: ./client/
+        stdin_open: true
+        ports: 
+            - "3000:3000"
+        networks: 
+            - mern-app  
+        volumes: 
+            - ./client/:/usr/src/app
+            - /usr/src/app/node_modules
+        environment: 
+            - REACT_APP_API=${REACT_APP_API}
+            - REACT_APP_GOOGLE_CLIENT_ID=${REACT_APP_GOOGLE_CLIENT_ID}
+            - REACT_APP_FACEBOOK_CLIENT_ID=${REACT_APP_FACEBOOK_CLIENT_ID}
+    react-server:
+        image: react-server
+        build: ./server/
+        ports:
+            - "8000:8000"
+        networks: 
+            - mern-app
+        volumes: 
+            - ./server/:/usr/src/app
+            - /usr/src/app/node_modules
+        environment: 
+            - NODE_ENV=${NODE_ENV}
+            - PORT=${PORT}
+            - CLIENT_URL=${CLIENT_URL}
+            - DATABASE=${DATABASE}
+            - SENDGRID_API_KEY=${SENDGRID_API_KEY}
+            - JWT_SECRET=${JWT_SECRET}
+            - JWT_ACCOUNT_ACTIVATION=${JWT_ACCOUNT_ACTIVATION}
+            - EMAIL_TO=${EMAIL_TO}
+            - EMAIL_FROM=${EMAIL_FROM}
+            - JWT_RESET_PASSWORD=${JWT_RESET_PASSWORD}
+            - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+        depends_on: 
+            - mongo
+    mongo:
+        image: mongo
+        ports: 
+            - "27017:27017"
+        networks: 
+            - mern-app
+        volumes: 
+            - mongo-data:/data/db
+networks: 
+    mern-app: 
+        driver: bridge
+volumes: 
+    mongo-data: 
+        driver: local
